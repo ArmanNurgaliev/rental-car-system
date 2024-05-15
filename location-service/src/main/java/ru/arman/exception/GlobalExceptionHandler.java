@@ -1,0 +1,41 @@
+package ru.arman.exception;
+
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.validation.FieldError;
+import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.RestControllerAdvice;
+import ru.arman.dto.ErrorMessage;
+
+import java.util.HashMap;
+import java.util.Map;
+
+@RestControllerAdvice
+public class GlobalExceptionHandler {
+
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<Map<String, String>> handleValidationExceptions(
+            MethodArgumentNotValidException ex) {
+        Map<String, String> errors = new HashMap<>();
+        ex.getBindingResult().getAllErrors().forEach((error) -> {
+            String fieldName = ((FieldError) error).getField();
+            String errorMessage = error.getDefaultMessage();
+            errors.put(fieldName, errorMessage);
+        });
+        return ResponseEntity.badRequest().body(errors);
+    }
+
+    @ExceptionHandler(LocationNotFoundException.class)
+    public ResponseEntity<ErrorMessage> handleLocationNotFoundException(LocationNotFoundException e) {
+        ErrorMessage errorMessage = new ErrorMessage(e.getMessage(), HttpStatus.NOT_FOUND);
+        return new ResponseEntity<>(errorMessage, HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler(LocationAlreadyExistsException.class)
+    public ResponseEntity<ErrorMessage> handleLocationAlreadyExistsException(LocationAlreadyExistsException e) {
+        ErrorMessage errorMessage = new ErrorMessage(e.getMessage(), HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<>(errorMessage, HttpStatus.BAD_REQUEST);
+    }
+}
+
