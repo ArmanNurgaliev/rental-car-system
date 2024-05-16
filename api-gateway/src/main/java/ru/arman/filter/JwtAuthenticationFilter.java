@@ -15,7 +15,6 @@ import reactor.core.publisher.Mono;
 import ru.arman.utils.JwtTokenUtil;
 
 import java.util.List;
-import java.util.function.Predicate;
 
 @Component
 @RequiredArgsConstructor
@@ -29,14 +28,13 @@ public class JwtAuthenticationFilter implements GatewayFilter {
 
         ServerHttpRequest request = exchange.getRequest();
 
-        final List<String> apiEndpoints = List.of("/api/user/login", "/api/user/register","/eureka");
+        final List<String> permitAll = List.of("/api/user/login", "/api/user/register","/eureka");
+        final List<String> checkAdmin = List.of("/api/user/make-admin", "/api/vehicle/add");
 
-        Predicate<ServerHttpRequest> isApiSecured = r -> apiEndpoints.stream()
-                .noneMatch(uri -> r.getURI().getPath().contains(uri));
 
-        log.info("JwtAuthenticationFilter | filter | isApiSecured.test(request) : " + isApiSecured.test(request));
+        log.info("JwtAuthenticationFilter | filter | isPermittedApi : " + checkApi(request, permitAll));
 
-        if (isApiSecured.test(request)) {
+        if (!checkApi(request, permitAll)) {
             if (!request.getHeaders().containsKey("Authorization")) {
                 ServerHttpResponse response = exchange.getResponse();
                 response.setStatusCode(HttpStatus.UNAUTHORIZED);
@@ -50,10 +48,20 @@ public class JwtAuthenticationFilter implements GatewayFilter {
             log.info("JwtAuthenticationFilter | filter | token : " + token);
 
             try {
-                jwtTokenUtil.validateToken(token);
+                boolean isPermitted = checkApi(request, checkAdmin) ?
+                        jwtTokenUtil.validateToken(token, "ROLE_ADMIN") :
+                        jwtTokenUtil.validateToken(token, "ROLE_CUSTOMER");
+
+                if (!isPermitted) {
+                    ServerHttpResponse response = exchange.getResponse();
+                    response.setStatusCode(HttpStatus.FORBIDDEN);
+
+                    return response.setComplete();
+                }
             } catch (ExpiredJwtException e) {
                 log.info("JwtAuthenticationFilter | filter | ExpiredJwtException | error : " + e.getMessage());
                 ServerHttpResponse response = exchange.getResponse();
+
                 response.setStatusCode(HttpStatus.UNAUTHORIZED);
 
                 return response.setComplete();
@@ -65,10 +73,14 @@ public class JwtAuthenticationFilter implements GatewayFilter {
                 return response.setComplete();
             }
 
-//            Claims claims = jwtTokenUtil.getClaims(token);
             exchange.getRequest().mutate().header("username", jwtTokenUtil.getUsernameFromToken(token)).build();
         }
 
         return chain.filter(exchange);
+    }
+
+    private boolean checkApi(ServerHttpRequest request, List<String> apis) {
+        return apis.stream()
+                .anyMatch(uri -> request.getURI().getPath().contains(uri));
     }
 }

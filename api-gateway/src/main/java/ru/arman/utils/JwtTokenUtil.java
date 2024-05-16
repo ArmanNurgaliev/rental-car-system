@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import javax.crypto.SecretKey;
+import java.util.Arrays;
 import java.util.function.Function;
 
 @Component
@@ -20,6 +21,9 @@ public class JwtTokenUtil {
         return getClaimFromToken(token, Claims::getSubject);
     }
 
+    public String getAuthoritiesFromToken(String token) {
+        return getClaimFromToken(token, (c) -> c.get("roles")).toString();
+    }
 
     public <T> T getClaimFromToken(String token, Function<Claims, T> claimsResolver) {
         final Claims claims = getAllClaimsFromToken(token);
@@ -35,21 +39,6 @@ public class JwtTokenUtil {
                     .build()
                     .parseSignedClaims(token)
                     .getPayload();
-        } catch (Exception e) {
-            System.out.println(e.getMessage() + ": " + e);
-        }
-        return null;
-    }
-
-    public Boolean validateToken(String token) {
-        try {
-            SecretKey key = Keys.hmacShaKeyFor(secret.getBytes());
-
-            Jwts.parser()
-                    .verifyWith(key)
-                    .build()
-                    .parseSignedClaims(token);
-            return true;
         } catch (SignatureException e) {
             log.error("JwtUtils | validateJwtToken | Invalid JWT signature: {}", e.getMessage());
             throw new SignatureException(e.getMessage());
@@ -66,5 +55,9 @@ public class JwtTokenUtil {
             log.error("JwtUtils | validateJwtToken | JWT claims string is empty: {}", e.getMessage());
             throw new IllegalArgumentException(e.getMessage());
         }
+    }
+
+    public boolean validateToken(String token, String role) {
+        return Arrays.stream(getAuthoritiesFromToken(token).split(",")).toList().contains(role);
     }
 }

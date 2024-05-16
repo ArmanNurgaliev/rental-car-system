@@ -31,7 +31,7 @@ public class VehicleController {
         return ResponseEntity.ok(vehicleService.getAllVehicles(locationId, startDate, endDate, carType, carClass, passengerCapacity, hasSunRoof, manufacturingYear));
     }
 
-    @PostMapping
+    @PostMapping("/add")
     public ResponseEntity<String> addVehicle(@RequestBody @Valid VehicleInputDto vehicle) {
         return ResponseEntity.ok(vehicleService.addVehicle(vehicle));
     }

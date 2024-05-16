@@ -4,14 +4,12 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 import ru.arman.entity.Role;
 import ru.arman.entity.User;
 
 import javax.crypto.SecretKey;
-import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -29,10 +27,6 @@ public class JwtTokenUtil {
         return getClaimFromToken(token, Claims::getSubject);
     }
 
-    public Collection<? extends GrantedAuthority> getAuthoritiesFromToken(String token) {
-        return (Collection<? extends GrantedAuthority>) getClaimFromToken(token, (c) -> c.get("roles"));
-    }
-
     public Date getExpirationDateFromToken(String token) {
         return getClaimFromToken(token, Claims::getExpiration);
     }
@@ -43,7 +37,6 @@ public class JwtTokenUtil {
     }
 
     private Claims getAllClaimsFromToken(String token) {
-//        byte[] bytes = Decoders.BASE64.decode(secret);
         SecretKey key = Keys.hmacShaKeyFor(secret.getBytes());
 
         return Jwts.parser()
@@ -58,24 +51,22 @@ public class JwtTokenUtil {
         return expiration.before(new Date());
     }
 
-    public String generateToken(UserDetails userDetails) {
+    public String generateToken(User user) {
         Map<String, Object> claims = new HashMap<>();
-        if (userDetails instanceof User customUserDetails) {
-            claims.put("email", customUserDetails.getEmail());
-            claims.put("name", customUserDetails.getName());
-        }
-        return doGenerateToken(claims, userDetails);
+        claims.put("email", user.getEmail());
+        claims.put("name", user.getName());
+
+        return doGenerateToken(claims, user);
     }
 
-    private String doGenerateToken(Map<String, Object> claims, UserDetails userDetails) {
-//        byte[] bytes = Decoders.BASE64.decode(secret);
+    private String doGenerateToken(Map<String, Object> claims, User user) {
         SecretKey key = Keys.hmacShaKeyFor(secret.getBytes());
 
         return Jwts.builder()
                 .claims(claims)
                 .issuer("self")
-                .subject(userDetails.getUsername())
-                .claim("roles", userDetails.getAuthorities())
+                .subject(user.getUsername())
+                .claim("roles", user.getRoles().stream().map(Role::getName).collect(Collectors.joining(",")))
                 .issuedAt(new Date(System.currentTimeMillis()))
                 .expiration(new Date(System.currentTimeMillis() + JWT_TOKEN_VALIDITY * 1000))
                 .signWith(key)

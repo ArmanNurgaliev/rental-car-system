@@ -80,13 +80,13 @@ public class UserService {
 
     public ResponseEntity<?> authenticate(AuthenticationRequest request)  {
         try {
-            UserDetails userDetails = userDetailsService.loadUserByUsername(request.getUsername());
+            User user = (User) userDetailsService.loadUserByUsername(request.getUsername());
             authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword()));
 
-            final String token = jwtTokenUtil.generateToken(userDetails);
+            final String token = jwtTokenUtil.generateToken(user);
 
             return ResponseEntity.ok(AuthenticationResponse.builder()
-                    .email(userDetails.getUsername())
+                    .email(user.getUsername())
                     .access_token(token)
                     .build());
         } catch (UsernameNotFoundException e) {
