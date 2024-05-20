@@ -18,6 +18,11 @@ import java.util.Optional;
 public class VehicleController {
     private final VehicleService vehicleService;
 
+    @GetMapping("/{id}")
+    public ResponseEntity<Vehicle> getVehicleById(@PathVariable Long id) {
+        return ResponseEntity.ok(vehicleService.getVehicleById(id));
+    }
+
     @GetMapping("/all")
     public ResponseEntity<List<Vehicle>> getAllVehicles(
                                 @RequestParam Long locationId,

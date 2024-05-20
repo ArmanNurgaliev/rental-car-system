@@ -1,8 +1,11 @@
 package ru.arman.entity;
 
+import com.google.zxing.qrcode.QRCodeWriter;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.awt.*;
+import java.awt.image.BufferedImage;
 import java.math.BigDecimal;
 
 @Entity
@@ -23,7 +26,8 @@ public class Vehicle {
     private BigDecimal priceForDay;
 
     private int passengerCapacity;
-    private String barCode;
+    @Transient
+    private byte[] qrCode;
     private boolean hasSunRoof;
     private String make;
     private String model;
@@ -33,9 +37,6 @@ public class Vehicle {
     private CarClass carClass;
     @Enumerated(EnumType.STRING)
     private CarType carType;
-
-//    @Enumerated(EnumType.STRING)а
-//    private VehicleStatus status;
 
     private Long locationId;
 }

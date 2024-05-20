@@ -26,8 +26,8 @@ public class GlobalExceptionHandler {
         return ResponseEntity.badRequest().body(errors);
     }
 
-    @ExceptionHandler(VehicleAlreadyExistsException.class)
-    public ResponseEntity<ErrorMessage> handleVehicleAlreadyExistsException(VehicleAlreadyExistsException e) {
+    @ExceptionHandler( {VehicleAlreadyExistsException.class, VehicleNotFoundException.class })
+    public ResponseEntity<ErrorMessage> handleVehicleAlreadyExistsException(RuntimeException e) {
         ErrorMessage errorMessage = new ErrorMessage(e.getMessage(), HttpStatus.BAD_REQUEST);
         return ResponseEntity.badRequest().body(errorMessage);
     }
