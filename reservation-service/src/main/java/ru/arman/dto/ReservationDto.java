@@ -22,6 +22,8 @@ public class ReservationDto {
     private Long returnLocationId;
     @NotNull(message = "Customer id can't be null")
     private Long customerId;
+    @NotBlank(message = "Customer email can't be empty")
+    private String customerEmail;
     @NotNull(message = "Vehicle id can't be null")
     private Long vehicleId;
 

@@ -113,7 +113,6 @@ public class VehicleService {
         Vehicle vehicle = mapDtoToVehicle(vehicleInputDto);
 
         vehicle.setStockNumber(generateStockNumber());
-        // TODO: generate barcode
         vehicleRepository.save(vehicle);
 
         return "Vehicle: " + vehicle.getName() + " added";

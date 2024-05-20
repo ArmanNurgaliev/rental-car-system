@@ -55,7 +55,7 @@ public class ReservationService {
         reservationRepository.save(reservation);
 
         ReservationPlacedEvent reservationPlacedEvent =
-                new ReservationPlacedEvent(reservation.getCustomerId(), reservation.getPickUpLocationId(), reservation.getDueDate());
+                new ReservationPlacedEvent(reservation.getCustomerId(), reservationDto.getCustomerEmail(), reservation.getPickUpLocationId(), reservation.getDueDate());
         template.send("reservation", reservationPlacedEvent);
 
         return "You reserved a car. It will wait you: " + reservation.getDueDate();

@@ -13,7 +13,7 @@ import java.sql.Date;
 @Setter
 public class ReservationPlacedEvent {
     private Long recipientId;
-
+    private String recipientEmail;
     private Long pickUpLocationId;
     private Date dueDate;
 }

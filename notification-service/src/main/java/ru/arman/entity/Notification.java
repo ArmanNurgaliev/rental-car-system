@@ -20,6 +20,7 @@ public class Notification {
     private Long id;
 
     private Long recipientId;
+    private String recipientEmail;
 
     private String message;
 
