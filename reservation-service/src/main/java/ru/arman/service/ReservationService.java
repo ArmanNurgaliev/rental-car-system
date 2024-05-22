@@ -116,6 +116,6 @@ public class ReservationService {
 
         reservationRepository.deleteById(reservationId);
 
-        return "Reservation cancelled. ";
+        return "Reservation cancelled.";
     }
 }

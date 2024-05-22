@@ -45,37 +45,37 @@ public class LocationService {
         return locationRepository.searchCountryLocations(country.toLowerCase(), query.toLowerCase());
     }
 
-    public List<Vehicle> getAvailableVehicles(String country,
-                                              String locationName,
-                                              Optional<Date> startDate,
-                                              Optional<Date> endDate,
-                                              Optional<List<String>> carType,
-                                              Optional<List<String>> carClass,
-                                              Optional<Integer> passengerCapacity,
-                                              Optional<Boolean> hasSunRoof,
-                                              Optional<Integer> manufacturingYear) {
-        Optional<Location> location =
-                locationRepository.findByCountryAndName(country.toLowerCase(), locationName.toLowerCase());
-
-        if (location.isEmpty())
-            throw new LocationNotFoundException("No location with name: " + locationName);
-
-        Vehicle[] vehicles = webClientBuilder.build().get()
-                .uri("http://vehicle-service/api/vehicle/all",
-                        uriBuilder -> uriBuilder.queryParam("locationId", location.get().getId())
-                                .queryParam("startDate", startDate)
-                                .queryParam("endDate", endDate)
-                                .queryParam("carType", carType)
-                                .queryParam("carClass", carClass)
-                                .queryParam("passengerCapacity", passengerCapacity)
-                                .queryParam("hasSunRoof", hasSunRoof)
-                                .queryParam("manufacturingYear", manufacturingYear)
-                                .build()
-                )
-                .retrieve()
-                .bodyToMono(Vehicle[].class)
-                .block();
-
-        return List.of(vehicles);
-    }
+//    public List<Vehicle> getAvailableVehicles(String country,
+//                                              String locationName,
+//                                              Optional<Date> startDate,
+//                                              Optional<Date> endDate,
+//                                              Optional<List<String>> carType,
+//                                              Optional<List<String>> carClass,
+//                                              Optional<Integer> passengerCapacity,
+//                                              Optional<Boolean> hasSunRoof,
+//                                              Optional<Integer> manufacturingYear) {
+//        Optional<Location> location =
+//                locationRepository.findByCountryAndName(country.toLowerCase(), locationName.toLowerCase());
+//
+//        if (location.isEmpty())
+//            throw new LocationNotFoundException("No location with name: " + locationName);
+//
+//        Vehicle[] vehicles = webClientBuilder.build().get()
+//                .uri("http://vehicle-service/api/vehicle/all",
+//                        uriBuilder -> uriBuilder.queryParam("locationId", location.get().getId())
+//                                .queryParam("startDate", startDate)
+//                                .queryParam("endDate", endDate)
+//                                .queryParam("carType", carType)
+//                                .queryParam("carClass", carClass)
+//                                .queryParam("passengerCapacity", passengerCapacity)
+//                                .queryParam("hasSunRoof", hasSunRoof)
+//                                .queryParam("manufacturingYear", manufacturingYear)
+//                                .build()
+//                )
+//                .retrieve()
+//                .bodyToMono(Vehicle[].class)
+//                .block();
+//
+//        return List.of(vehicles);
+//    }
 }

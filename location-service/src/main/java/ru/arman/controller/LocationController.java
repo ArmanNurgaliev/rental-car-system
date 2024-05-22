@@ -31,19 +31,19 @@ public class LocationController {
         return ResponseEntity.ok(locationService.searchCountryLocations(country, query));
     }
 
-    @GetMapping("/{country}/{location}")
-    public ResponseEntity<List<Vehicle>> getAvailableVehicles(@PathVariable String country,
-                                                              @PathVariable String location,
-                                                              @RequestParam Optional<Date> startDate,
-                                                              @RequestParam Optional<Date> endDate,
-                                                              @RequestParam Optional<List<String>> carType,
-                                                              @RequestParam Optional<List<String>> carClass,
-                                                              @RequestParam Optional<Integer> passengerCapacity,
-                                                              @RequestParam Optional<Boolean> hasSunRoof,
-                                                              @RequestParam Optional<Integer> manufacturingYear) {
-        return ResponseEntity.ok(locationService.getAvailableVehicles(country, location, startDate, endDate,
-                carType, carClass, passengerCapacity, hasSunRoof, manufacturingYear));
-    }
+//    @GetMapping("/{country}/{location}")
+//    public ResponseEntity<List<Vehicle>> getAvailableVehicles(@PathVariable String country,
+//                                                              @PathVariable String location,
+//                                                              @RequestParam Optional<Date> startDate,
+//                                                              @RequestParam Optional<Date> endDate,
+//                                                              @RequestParam Optional<List<String>> carType,
+//                                                              @RequestParam Optional<List<String>> carClass,
+//                                                              @RequestParam Optional<Integer> passengerCapacity,
+//                                                              @RequestParam Optional<Boolean> hasSunRoof,
+//                                                              @RequestParam Optional<Integer> manufacturingYear) {
+//        return ResponseEntity.ok(locationService.getAvailableVehicles(country, location, startDate, endDate,
+//                carType, carClass, passengerCapacity, hasSunRoof, manufacturingYear));
+//    }
 
     @PostMapping
     public ResponseEntity<String> addLocation(@RequestBody @Valid LocationDto locationDto) {
