@@ -1,12 +1,105 @@
 version: '3'
 services:
+  account-db:
+    image: postgres
+    environment:
+      POSTGRES_DB: rental-car-accounts
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+      PGDATA: /data/postgres
+    volumes:
+      - ./account-db:/data/postgres
+    expose:
+      - "5431"
+    ports:
+      - "5431:5431"
+    command: -p 5431
+    restart: unless-stopped
+
+  location-db:
+    image: postgres
+    environment:
+      POSTGRES_DB: rental-car-location
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+      PGDATA: /data/postgres
+    volumes:
+      - ./location-db:/data/postgres
+    ports:
+      - "5432:5432"
+    restart: unless-stopped
+
+  notification-db:
+    image: postgres
+    environment:
+      POSTGRES_DB: rental-car-notification
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+      PGDATA: /data/postgres
+    volumes:
+      - ./notification-db:/data/postgres
+    expose:
+      - "5433"
+    ports:
+      - "5433:5433"
+    command: -p 5433
+    restart: unless-stopped
+
+  payment-db:
+    image: postgres
+    environment:
+      POSTGRES_DB: rental-car-payment
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+      PGDATA: /data/postgres
+    volumes:
+      - ./payment-db:/data/postgres
+    expose:
+      - "5434"
+    ports:
+      - "5434:5434"
+    command: -p 5434
+    restart: unless-stopped
+
+  reservation-db:
+    image: postgres
+    environment:
+      POSTGRES_DB: rental-car-reservation
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+      PGDATA: /data/postgres
+    volumes:
+      - ./reservation-db:/data/postgres
+    expose:
+      - "5435"
+    ports:
+      - "5435:5435"
+    command: -p 5435
+    restart: unless-stopped
+
+  vehicle-db:
+    image: postgres
+    environment:
+      POSTGRES_DB: rental-car-vehicle
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+      PGDATA: /data/postgres
+    volumes:
+      - ./vehicle-db:/data/postgres
+    expose:
+      - "5436"
+    ports:
+      - "5436:5436"
+    command: -p 5436
+    restart: unless-stopped
+
   zookeeper:
     image: confluentinc/cp-zookeeper:7.4.4
     environment:
       ZOOKEEPER_CLIENT_PORT: 2181
       ZOOKEEPER_TICK_TIME: 2000
     ports:
-      - "22181:2181"
+      - ":2181"
 
   kafka:
     image: confluentinc/cp-kafka:7.4.4
@@ -21,3 +114,133 @@ services:
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
       KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+
+  discovery-server:
+    image: armanurgaliev/discovery-server:latest
+    container_name: discovery-server
+    ports:
+      - "8761:8761"
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+
+  api-gateway:
+    image: armanurgaliev/api-gateway:latest
+    container_name: api-gateway
+    ports:
+      - "8080:8080"
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+      - LOGGING_LEVEL_ORG_SPRINGFRAMEWORK_SECURITY=TRACE
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka:password@discovery-server:8761/eureka
+    depends_on:
+      - discovery-server
+
+  auth-service:
+    image: armanurgaliev/auth-service:latest
+    container_name: auth-service
+    ports:
+      - "8081:8081"
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://account-db:5431/rental-car-accounts
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka:password@discovery-server:8761/eureka
+    depends_on:
+      - account-db
+      - discovery-server
+      - api-gateway
+
+  location-service:
+    image: armanurgaliev/location-service:latest
+    container_name: location-service
+    ports:
+      - "8082:8082"
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://location-db:5432/rental-car-location
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka:password@discovery-server:8761/eureka
+    depends_on:
+      - location-db
+      - discovery-server
+      - api-gateway
+
+  notification-service:
+    image: armanurgaliev/notification-service:latest
+    container_name: notification-service
+    ports:
+      - "8083:8083"
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://notification-db:5433/rental-car-notification
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka:password@discovery-server:8761/eureka
+    depends_on:
+      - notification-db
+      - kafka
+      - discovery-server
+      - api-gateway
+
+  payment-service:
+    image: armanurgaliev/payment-service:latest
+    container_name: payment-service
+    ports:
+      - "8084:8084"
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://payment-db:5434/rental-car-payment
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka:password@discovery-server:8761/eureka
+    depends_on:
+      - payment-db
+      - discovery-server
+      - api-gateway
+
+  reservation-service:
+    image: armanurgaliev/reservation-service:latest
+    container_name: reservation-service
+    ports:
+      - "8085:8085"
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://reservation-db:5435/rental-car-reservation
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka:password@discovery-server:8761/eureka
+    depends_on:
+      - reservation-db
+      - kafka
+      - discovery-server
+      - api-gateway
+
+  vehicle-service:
+    image: armanurgaliev/vehicle-service:latest
+    container_name: vehicle-service
+    ports:
+      - "8086:8086"
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://vehicle-db:5436/rental-car-vehicle
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka:password@discovery-server:8761/eureka
+    depends_on:
+      - vehicle-db
+      - discovery-server
+      - api-gateway
+
+  prometheus:
+    image: prom/prometheus:v2.52.0
+    container_name: prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+    depends_on:
+      - auth-service
+      - location-service
+      - notification-service
+      - payment-service
+      - reservation-service
+      - vehicle-service
+
+  grafana:
+    image: grafana/grafana:10.1.10
+    container_name: grafana
+    ports:
+      - "3000:3000"
+    restart: unless-stopped
+    volumes:
+      - ./grafana/provisioning/datasources:/etc/grafana/provisioning/datasources
