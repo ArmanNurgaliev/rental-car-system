@@ -1,7 +1,6 @@
 package ru.arman.service;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.arman.dto.PaymentDto;
@@ -48,7 +47,7 @@ public class PaymentService {
     }
 
     public String cancelPayment(Long paymentId) {
-        Payment payment = paymentRepository.findById(paymentId)
+        paymentRepository.findById(paymentId)
                         .orElseThrow(() -> new PaymentNotFoundException("No payment with id: " + paymentId));
         // return money
 

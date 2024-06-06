@@ -68,9 +68,9 @@ public class ReservationService {
         if (reservationDto.getDueDate().after(reservationDto.getReturnDate()))
             throw new ReservationDatesException("Wrong reservation dates");
 
-        Optional<Reservation> isReserved =
+        List<Reservation> reservations =
                 reservationRepository.findReservationByVehicleAndDates(reservationDto.getVehicleId(), reservationDto.getDueDate(), reservationDto.getReturnDate());
-        if (isReserved.isPresent())
+        if (!reservations.isEmpty())
             throw new VehicleAlreadyReservedException("Vehicle is reserved at this dates");
     }
 
@@ -95,10 +95,13 @@ public class ReservationService {
 
     public List<Long> getChangedLocationVehicles(List<VehicleDto> vehicles) {
         List<Long> changedLocationVehicles = new ArrayList<>();
+        System.out.println(vehicles.get(0));
         for (VehicleDto v: vehicles) {
             Optional<Reservation> reservation =
                     reservationRepository.findVehiclesChangedLocation(v.getVehicleId(), v.getStartDate(), v.getLocationId());
-            reservation.ifPresent(value -> changedLocationVehicles.add(value.getVehicleId()));
+
+             reservation.filter(value -> !v.getLocationId().equals(value.getReturnLocationId()))
+                    .ifPresent(r -> changedLocationVehicles.add(r.getVehicleId()));
         }
 
         return changedLocationVehicles;

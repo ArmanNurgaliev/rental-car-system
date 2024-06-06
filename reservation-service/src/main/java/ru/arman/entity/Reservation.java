@@ -11,6 +11,7 @@ import java.sql.Date;
 @Getter
 @Setter
 @Builder
+@ToString
 public class Reservation {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

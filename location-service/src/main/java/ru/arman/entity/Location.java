@@ -2,9 +2,6 @@ package ru.arman.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
-import ru.arman.dto.UserDto;
-
-import java.util.List;
 
 @Entity
 @Getter
@@ -20,9 +17,4 @@ public class Location {
 
     @Embedded
     private Address address;
-
-    // Administrators who works in this location
-//    @Transient
-//    private List<UserDto> administrators;
-
 }

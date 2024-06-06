@@ -1,11 +1,13 @@
 package ru.arman.dto;
 
 import jakarta.validation.constraints.NotBlank;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
 @Getter
 @Setter
+@Builder
 public class LocationDto {
     @NotBlank(message = "Name can't be empty")
     private String name;

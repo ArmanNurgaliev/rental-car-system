@@ -14,7 +14,7 @@ import ru.arman.service.UserService;
 @RequiredArgsConstructor
 public class UserController {
     private final UserService userService;
-
+// TODO: add migration with admin user
     @PostMapping("/register")
     public ResponseEntity<String> createUser(@RequestBody @Valid UserDto userDto) {
         return new ResponseEntity<>(userService.createUser(userDto), HttpStatus.CREATED);
@@ -26,7 +26,6 @@ public class UserController {
     }
 
     @PostMapping("/make-admin")
-//    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<String> makeUserAnAdmin(@RequestParam Long user_id) {
         return ResponseEntity.ok(userService.makeAdmin(user_id));
     }

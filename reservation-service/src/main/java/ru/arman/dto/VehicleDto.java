@@ -1,6 +1,7 @@
 package ru.arman.dto;
 
 import jakarta.validation.constraints.NotNull;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -9,6 +10,7 @@ import java.sql.Date;
 
 @Getter
 @Setter
+@Builder
 @ToString
 public class VehicleDto {
     @NotNull(message = "Vehicle id can't be null")
