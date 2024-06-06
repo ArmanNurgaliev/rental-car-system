@@ -11,13 +11,8 @@ import java.util.Optional;
 public interface VehicleRepository extends JpaRepository<Vehicle, Long>,
         JpaSpecificationExecutor<Vehicle> {
     Optional<Vehicle> findByLicenseNumber(String licenseNumber);
-//    Page findAll(Specification<Vehicle> specification, Pageable page);
 
     List<Vehicle> findAll(Specification<Vehicle> specification);
 
     boolean existsByStockNumber(String stockNumber);
-
-//    Page findAll(Pageable page);
-//
-//    List<Vehicle> findAll();
 }

@@ -42,7 +42,6 @@ public class VehicleService {
                                         Optional<Integer> passengerCapacity,
                                         Optional<Boolean> hasSunRoof,
                                         Optional<Integer> manufacturingYear) {
-//        Pageable paging = PageRequest.of(0, 6);
         Specification<Vehicle> spec =
                 vehicleSpecification.searchVehicle(locationId, carType, carClass, passengerCapacity, hasSunRoof, manufacturingYear);
         List<Vehicle> vehicles = vehicleRepository.findAll(spec);

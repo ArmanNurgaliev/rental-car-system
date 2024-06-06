@@ -8,6 +8,7 @@ import java.math.BigDecimal;
 
 @Getter
 @Setter
+@Builder
 public class PaymentResponseDto {
     private Long id;
     private Long customerId;
