@@ -4,8 +4,8 @@ services:
     image: postgres
     environment:
       POSTGRES_DB: rental-car-accounts
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: password
+      POSTGRES_USER: $DB_USER
+      POSTGRES_PASSWORD: $DB_PASS
       PGDATA: /data/postgres
     volumes:
       - ./account-db:/data/postgres
@@ -16,12 +16,23 @@ services:
     command: -p 5431
     restart: unless-stopped
 
+  flyway:
+    image: flyway/flyway
+    command: -url=jdbc:postgresql://account-db:5431/rental-car-accounts -schemas=public -user=$DB_USER -password=$DB_PASS -connectRetries=60 migrate
+    environment:
+      - FLYWAY_BASELINE_ON_MIGRATE=true
+      - SPRING_FLYWAY_LOCATIONS=classpath:db/migration/
+    volumes:
+      - .:/flyway/sql
+    depends_on:
+      - account-db
+
   location-db:
     image: postgres
     environment:
       POSTGRES_DB: rental-car-location
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: password
+      POSTGRES_USER: $DB_USER
+      POSTGRES_PASSWORD: $DB_PASS
       PGDATA: /data/postgres
     volumes:
       - ./location-db:/data/postgres
@@ -33,8 +44,8 @@ services:
     image: postgres
     environment:
       POSTGRES_DB: rental-car-notification
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: password
+      POSTGRES_USER: $DB_USER
+      POSTGRES_PASSWORD: $DB_PASS
       PGDATA: /data/postgres
     volumes:
       - ./notification-db:/data/postgres
@@ -49,8 +60,8 @@ services:
     image: postgres
     environment:
       POSTGRES_DB: rental-car-payment
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: password
+      POSTGRES_USER: $DB_USER
+      POSTGRES_PASSWORD: $DB_PASS
       PGDATA: /data/postgres
     volumes:
       - ./payment-db:/data/postgres
@@ -65,8 +76,8 @@ services:
     image: postgres
     environment:
       POSTGRES_DB: rental-car-reservation
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: password
+      POSTGRES_USER: $DB_USER
+      POSTGRES_PASSWORD: $DB_PASS
       PGDATA: /data/postgres
     volumes:
       - ./reservation-db:/data/postgres
@@ -81,8 +92,8 @@ services:
     image: postgres
     environment:
       POSTGRES_DB: rental-car-vehicle
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: password
+      POSTGRES_USER: $DB_USER
+      POSTGRES_PASSWORD: $DB_PASS
       PGDATA: /data/postgres
     volumes:
       - ./vehicle-db:/data/postgres

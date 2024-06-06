@@ -14,7 +14,7 @@ import ru.arman.service.UserService;
 @RequiredArgsConstructor
 public class UserController {
     private final UserService userService;
-// TODO: add migration with admin user
+
     @PostMapping("/register")
     public ResponseEntity<String> createUser(@RequestBody @Valid UserDto userDto) {
         return new ResponseEntity<>(userService.createUser(userDto), HttpStatus.CREATED);

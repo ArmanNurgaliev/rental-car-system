@@ -87,7 +87,7 @@ public class UserService {
                     .email(user.getUsername())
                     .access_token(token)
                     .build());
-        } catch (UsernameNotFoundException e) {
+        } catch (UserNotFoundException | UsernameNotFoundException e) {
             return  ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
         } catch (BadCredentialsException e) {
             return ResponseEntity.badRequest().body("Invalid Credentials!");
